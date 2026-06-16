@@ -1,4 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# mymind
+
+Developers often keep critical working knowledge across too many places: VS Code snippets, Notion pages, AI chat histories, GitHub gists, bookmarks, terminal history, random files, and project folders.
+
+**mymind** is a centralized hub these scattered resources into one developer-focused hub where users can save, organize, search, and reuse their most valuable technical knowledge.
 
 ## Getting Started
 

@@ -31,6 +31,13 @@ export default function DashboardPage() {
         </p>
       </header>
 
+      <StatsCards
+        totalItems={totalItems}
+        totalCollections={totalCollections}
+        favoriteItems={favoriteItems}
+        favoriteCollections={favoriteCollections}
+      />
+
       {pinnedItems.length > 0 ? (
         <section className="flex flex-col gap-3">
           <SectionHeader title="Pinned" />

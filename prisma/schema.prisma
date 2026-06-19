@@ -1,0 +1,223 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ContentType {
+  TEXT
+  URL
+  FILE
+  IMAGE
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+model User {
+  id                   String    @id @default(cuid())
+  name                 String?
+  email                String    @unique
+  emailVerified        DateTime?
+  image                String?
+
+  plan                 Plan      @default(FREE)
+  isPro                Boolean   @default(false)
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+
+  accounts             Account[]
+  sessions             Session[]
+
+  items                Item[]
+  itemTypes            ItemType[]
+  collections          Collection[]
+  tags                 Tag[]
+  usageEvents          ItemUsageEvent[]
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ItemType {
+  id          String      @id @default(cuid())
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  slug        String
+  icon        String
+  color       String
+  softBg      String?
+  borderColor String?
+  contentType ContentType
+  isSystem    Boolean     @default(false)
+  isProOnly   Boolean     @default(false)
+
+  items       Item[]
+  collections Collection[] @relation("DefaultCollectionType")
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([userId, slug])
+  @@index([isSystem])
+}
+
+model Item {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  itemTypeId   String
+  itemType     ItemType    @relation(fields: [itemTypeId], references: [id])
+
+  title        String
+  description  String?
+  contentType  ContentType
+  content      String?
+  url          String?
+
+  fileUrl      String?
+  fileKey      String?
+  fileName     String?
+  fileMimeType String?
+  fileSize     Int?
+
+  language     String?
+  isFavorite   Boolean     @default(false)
+  isPinned     Boolean     @default(false)
+  lastUsedAt   DateTime?
+
+  collections  ItemCollection[]
+  tags         ItemTag[]
+  usageEvents  ItemUsageEvent[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([userId, itemTypeId])
+  @@index([userId, isFavorite])
+  @@index([userId, isPinned])
+  @@index([userId, lastUsedAt])
+}
+
+model Collection {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  defaultTypeId String?
+  defaultType   ItemType? @relation("DefaultCollectionType", fields: [defaultTypeId], references: [id])
+
+  name          String
+  slug          String
+  description   String?
+  isFavorite    Boolean   @default(false)
+
+  items         ItemCollection[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, slug])
+  @@index([userId, isFavorite])
+}
+
+model ItemCollection {
+  itemId       String
+  collectionId String
+
+  item         Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  addedAt      DateTime   @default(now())
+
+  @@id([itemId, collectionId])
+  @@index([collectionId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name      String
+  slug      String
+  items     ItemTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, slug])
+}
+
+model ItemTag {
+  itemId String
+  tagId  String
+
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, tagId])
+  @@index([tagId])
+}
+
+model ItemUsageEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  eventType String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([itemId, createdAt])
+}

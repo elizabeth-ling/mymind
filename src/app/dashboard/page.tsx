@@ -3,24 +3,29 @@ import Link from "next/link";
 import { CollectionCard } from "@/components/dashboard/collection-card";
 import { ItemCard } from "@/components/dashboard/item-card";
 import { StatsCards } from "@/components/dashboard/stats-cards";
-import { collections, items } from "@/lib/mock-data";
+import { getRecentCollections } from "@/lib/db/collections";
+import { getDashboardStats, getPinnedItems, getRecentItems } from "@/lib/db/items";
+import { getCurrentUserId } from "@/lib/db/user";
 
-export default function DashboardPage() {
-  const pinnedItems = items.filter((i) => i.isPinned);
+// Personalized, data-driven dashboard — always read fresh from the database.
+export const dynamic = "force-dynamic";
 
-  const recentItems = [...items]
-    .sort(
-      (a, b) =>
-        new Date(b.lastUsedAt).getTime() - new Date(a.lastUsedAt).getTime()
-    )
-    .slice(0, 10);
+export default async function DashboardPage() {
+  const userId = await getCurrentUserId();
 
-  const recentCollections = collections.slice(0, 6);
-
-  const totalItems = items.length;
-  const totalCollections = collections.length;
-  const favoriteItems = items.filter((i) => i.isFavorite).length;
-  const favoriteCollections = collections.filter((c) => c.isFavorite).length;
+  const [stats, pinnedItems, recentCollections, recentItems] = userId
+    ? await Promise.all([
+        getDashboardStats(userId),
+        getPinnedItems(userId),
+        getRecentCollections(userId),
+        getRecentItems(userId, 10),
+      ])
+    : [
+        { totalItems: 0, totalCollections: 0, favoriteItems: 0, favoriteCollections: 0 },
+        [],
+        [],
+        [],
+      ];
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-8">
@@ -32,10 +37,10 @@ export default function DashboardPage() {
       </header>
 
       <StatsCards
-        totalItems={totalItems}
-        totalCollections={totalCollections}
-        favoriteItems={favoriteItems}
-        favoriteCollections={favoriteCollections}
+        totalItems={stats.totalItems}
+        totalCollections={stats.totalCollections}
+        favoriteItems={stats.favoriteItems}
+        favoriteCollections={stats.favoriteCollections}
       />
 
       {pinnedItems.length > 0 ? (

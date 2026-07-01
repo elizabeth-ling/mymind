@@ -1,14 +1,12 @@
 import { Star } from "lucide-react";
 
+import type { ItemCardData } from "@/lib/db/items";
 import { formatRelativeTime } from "@/lib/format";
-import { itemTypes, type items } from "@/lib/mock-data";
 
 import { iconMap } from "./icon-map";
 
-type Item = (typeof items)[number];
-
-export function ItemCard({ item }: { item: Item }) {
-  const itemType = itemTypes.find((t) => t.id === item.itemTypeId);
+export function ItemCard({ item }: { item: ItemCardData }) {
+  const { itemType } = item;
   const Icon = itemType ? iconMap[itemType.icon] : null;
 
   return (
@@ -18,8 +16,8 @@ export function ItemCard({ item }: { item: Item }) {
           <span
             className="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium"
             style={{
-              backgroundColor: itemType.softBg,
-              borderColor: itemType.borderColor,
+              backgroundColor: itemType.softBg ?? undefined,
+              borderColor: itemType.borderColor ?? undefined,
               color: itemType.color,
             }}
           >
@@ -54,9 +52,11 @@ export function ItemCard({ item }: { item: Item }) {
         </p>
       ) : null}
 
-      <p className="mt-auto text-xs text-muted-foreground">
-        {formatRelativeTime(item.lastUsedAt)}
-      </p>
+      {item.lastUsedAt ? (
+        <p className="mt-auto text-xs text-muted-foreground">
+          {formatRelativeTime(item.lastUsedAt)}
+        </p>
+      ) : null}
     </article>
   );
 }

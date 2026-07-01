@@ -25,6 +25,7 @@ model User {
   email                String    @unique
   emailVerified        DateTime?
   image                String?
+  passwordHash         String?
 
   plan                 Plan      @default(FREE)
   isPro                Boolean   @default(false)

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, Folder, LayoutDashboard, Lock, PanelLeftClose, Settings, Star, LayoutDashboardIcon } from "lucide-react";
+import { Clock, Folder, LayoutDashboard, Lock, PanelLeftClose, Pin, Settings, Star, LayoutDashboardIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { collections, currentUser, itemTypes } from "@/lib/mock-data";
+import { collections, currentUser, items, itemTypes } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 import { iconMap } from "./icon-map";
@@ -17,6 +17,8 @@ interface SidebarProps {
 export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
   const favoriteCollections = collections.filter((c) => c.isFavorite);
   const recentCollections = collections.filter((c) => !c.isFavorite).slice(0, 4);
+  const pinnedItems = items.filter((i) => i.isPinned).slice(0, 6);
+  const starredItems = items.filter((i) => i.isFavorite).slice(0, 6);
 
   const userInitials = currentUser.name
     .split(" ")
@@ -79,6 +81,44 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
             </SidebarLink>
           </li>
         </ul>
+
+        {pinnedItems.length > 0 && (
+          <>
+            <SectionHeading>Pinned</SectionHeading>
+            <ul className="space-y-0.5">
+              {pinnedItems.map((item) => (
+                <li key={item.id}>
+                  <SidebarLink
+                    href={`/items/${item.id}`}
+                    icon={<Pin className="size-4 text-muted-foreground" />}
+                    onNavigate={handleNavigate}
+                  >
+                    {item.title}
+                  </SidebarLink>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {starredItems.length > 0 && (
+          <>
+            <SectionHeading>Starred</SectionHeading>
+            <ul className="space-y-0.5">
+              {starredItems.map((item) => (
+                <li key={item.id}>
+                  <SidebarLink
+                    href={`/items/${item.id}`}
+                    icon={<Star className="size-4 text-muted-foreground" />}
+                    onNavigate={handleNavigate}
+                  >
+                    {item.title}
+                  </SidebarLink>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <SectionHeading>Item Types</SectionHeading>
         <ul className="space-y-0.5">

@@ -20,6 +20,33 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
   const pinnedItems = items.filter((i) => i.isPinned).slice(0, 6);
   const starredItems = items.filter((i) => i.isFavorite).slice(0, 6);
 
+  const itemCountByType = new Map<string, number>();
+  for (const item of items) {
+    itemCountByType.set(
+      item.itemTypeId,
+      (itemCountByType.get(item.itemTypeId) ?? 0) + 1
+    );
+  }
+
+  const getDominantTypeColor = (collectionId: string): string | undefined => {
+    const counts = new Map<string, number>();
+    for (const item of items) {
+      if (!item.collectionIds.includes(collectionId)) continue;
+      counts.set(item.itemTypeId, (counts.get(item.itemTypeId) ?? 0) + 1);
+    }
+
+    let topTypeId: string | undefined;
+    let topCount = 0;
+    for (const [typeId, count] of counts) {
+      if (count > topCount) {
+        topCount = count;
+        topTypeId = typeId;
+      }
+    }
+
+    return itemTypes.find((type) => type.id === topTypeId)?.color;
+  };
+
   const userInitials = currentUser.name
     .split(" ")
     .map((part) => part[0])
@@ -137,7 +164,11 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
                   trailing={
                     type.isProOnly ? (
                       <Lock className="size-3 text-muted-foreground" />
-                    ) : null
+                    ) : (
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {itemCountByType.get(type.id) ?? 0}
+                      </span>
+                    )
                   }
                 >
                   {type.name}
@@ -151,17 +182,28 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
           <>
             <SectionHeading>Recent Collections</SectionHeading>
             <ul className="space-y-0.5">
-              {recentCollections.map((collection) => (
-                <li key={collection.id}>
-                  <SidebarLink
-                    href={`/collections/${collection.slug}`}
-                    icon={<Folder className="size-4 text-muted-foreground" />}
-                    onNavigate={handleNavigate}
-                  >
-                    {collection.name}
-                  </SidebarLink>
-                </li>
-              ))}
+              {recentCollections.map((collection) => {
+                const folderColor = getDominantTypeColor(collection.id);
+                return (
+                  <li key={collection.id}>
+                    <SidebarLink
+                      href={`/collections/${collection.slug}`}
+                      icon={
+                        <Folder
+                          className={cn(
+                            "size-4",
+                            !folderColor && "text-muted-foreground"
+                          )}
+                          style={folderColor ? { color: folderColor } : undefined}
+                        />
+                      }
+                      onNavigate={handleNavigate}
+                    >
+                      {collection.name}
+                    </SidebarLink>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}

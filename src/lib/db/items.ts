@@ -10,7 +10,6 @@ const itemCardSelect = {
   content: true,
   url: true,
   isFavorite: true,
-  isPinned: true,
   lastUsedAt: true,
   itemType: {
     select: {
@@ -24,14 +23,6 @@ const itemCardSelect = {
 } satisfies Prisma.ItemSelect;
 
 export type ItemCardData = Prisma.ItemGetPayload<{ select: typeof itemCardSelect }>;
-
-export function getPinnedItems(userId: string): Promise<ItemCardData[]> {
-  return prisma.item.findMany({
-    where: { userId, isPinned: true },
-    select: itemCardSelect,
-    orderBy: { lastUsedAt: "desc" },
-  });
-}
 
 export function getRecentItems(userId: string, limit = 10): Promise<ItemCardData[]> {
   return prisma.item.findMany({

@@ -4,7 +4,7 @@ import { CollectionCard } from "@/components/dashboard/collection-card";
 import { ItemCard } from "@/components/dashboard/item-card";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { getRecentCollections } from "@/lib/db/collections";
-import { getDashboardStats, getPinnedItems, getRecentItems } from "@/lib/db/items";
+import { getDashboardStats, getRecentItems } from "@/lib/db/items";
 import { getCurrentUserId } from "@/lib/db/user";
 
 // Personalized, data-driven dashboard — always read fresh from the database.
@@ -13,16 +13,14 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const userId = await getCurrentUserId();
 
-  const [stats, pinnedItems, recentCollections, recentItems] = userId
+  const [stats, recentCollections, recentItems] = userId
     ? await Promise.all([
         getDashboardStats(userId),
-        getPinnedItems(userId),
         getRecentCollections(userId),
         getRecentItems(userId, 10),
       ])
     : [
         { totalItems: 0, totalCollections: 0, favoriteItems: 0, favoriteCollections: 0 },
-        [],
         [],
         [],
       ];
@@ -42,17 +40,6 @@ export default async function DashboardPage() {
         favoriteItems={stats.favoriteItems}
         favoriteCollections={stats.favoriteCollections}
       />
-
-      {pinnedItems.length > 0 ? (
-        <section className="flex flex-col gap-3">
-          <SectionHeader title="Pinned" />
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {pinnedItems.map((item) => (
-              <ItemCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       <section className="flex flex-col gap-3">
         <SectionHeader

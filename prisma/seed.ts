@@ -114,7 +114,6 @@ type SeedItem = {
   language?: string;
   tags?: string[];
   isFavorite?: boolean;
-  isPinned?: boolean;
 };
 
 type SeedCollection = {
@@ -137,7 +136,6 @@ const collections: SeedCollection[] = [
         language: "typescript",
         tags: ["react", "hooks"],
         isFavorite: true,
-        isPinned: true,
         content: `import { useEffect, useState } from "react";
 
 export function useDebounce<T>(value: T, delay = 300): T {
@@ -215,7 +213,6 @@ export function useTheme() {
         title: "Code review prompt",
         description: "Thorough code review with prioritized findings",
         tags: ["ai", "review"],
-        isPinned: true,
         content: `You are a senior engineer reviewing a pull request.
 
 Review the diff below for:
@@ -541,7 +538,6 @@ async function main() {
             url: item.url ?? null,
             language: item.language ?? null,
             isFavorite: item.isFavorite ?? false,
-            isPinned: item.isPinned ?? false,
             lastUsedAt,
             collections: {
               create: { collectionId: created.id },

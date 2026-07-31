@@ -1,4 +1,4 @@
-import { Pin, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 import type { ItemCardData } from "@/lib/db/items";
 import { formatRelativeTime } from "@/lib/format";
@@ -26,9 +26,6 @@ export function ItemCard({ item }: { item: ItemCardData }) {
           </span>
         ) : null}
         <div className="flex shrink-0 items-center gap-1">
-          {item.isPinned ? (
-            <Pin className="size-4 fill-accent text-accent" />
-          ) : null}
           {item.isFavorite ? (
             <Star className="size-4 fill-accent text-accent" />
           ) : null}

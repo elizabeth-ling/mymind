@@ -131,7 +131,6 @@ model Item {
 
   language     String?
   isFavorite   Boolean     @default(false)
-  isPinned     Boolean     @default(false)
   lastUsedAt   DateTime?
 
   collections  ItemCollection[]
@@ -143,7 +142,6 @@ model Item {
 
   @@index([userId, itemTypeId])
   @@index([userId, isFavorite])
-  @@index([userId, isPinned])
   @@index([userId, lastUsedAt])
 }
 

@@ -42,7 +42,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+## vibecoding stuff
 AGENTS.md
 CLAUDE.md
 context/*
 /.agents/
+.claude

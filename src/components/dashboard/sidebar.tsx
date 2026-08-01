@@ -1,21 +1,14 @@
-"use client";
-
 import Link from "next/link";
-import { Clock, Folder, LayoutDashboard, Lock, PanelLeftClose, Settings, Star, LayoutDashboardIcon } from "lucide-react";
+import { Clock, Folder, Lock, Settings, Star, LayoutDashboardIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { collections, currentUser, items, itemTypes } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 import { iconMap } from "./icon-map";
+import { SidebarCloseButton } from "./sidebar-close-button";
 
-interface SidebarProps {
-  onClose: () => void;
-  closeOnNavigate?: boolean;
-}
-
-export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
-  const favoriteCollections = collections.filter((c) => c.isFavorite);
+export function Sidebar() {
   const recentCollections = collections.filter((c) => !c.isFavorite).slice(0, 4);
   const starredItems = items.filter((i) => i.isFavorite).slice(0, 6);
 
@@ -53,27 +46,16 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
     .join("")
     .toUpperCase();
 
-  const handleNavigate = closeOnNavigate ? onClose : undefined;
-
   return (
     <div className="flex h-full w-full flex-col border-r border-border bg-surface-muted">
       <div className="flex h-14 shrink-0 items-end justify-between px-4 pb-2">
         <Link
           href="/dashboard"
-          onClick={handleNavigate}
           className="text-lg font-semibold leading-none tracking-tight text-foreground"
         >
           mymind
         </Link>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Close sidebar"
-          className="-mb-1 size-8 md:hidden"
-          onClick={onClose}
-        >
-          <PanelLeftClose />
-        </Button>
+        <SidebarCloseButton />
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 pb-2">
@@ -83,7 +65,6 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
             <SidebarLink
               href="/recent"
               icon={<LayoutDashboardIcon className="size-4" />}
-              onNavigate={handleNavigate}
             >
               Dashboard
             </SidebarLink>
@@ -92,7 +73,6 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
             <SidebarLink
               href="/recent"
               icon={<Clock className="size-4" />}
-              onNavigate={handleNavigate}
             >
               Recent
             </SidebarLink>
@@ -101,7 +81,6 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
             <SidebarLink
               href="/favorites"
               icon={<Star className="size-4" />}
-              onNavigate={handleNavigate}
             >
               Favorites
             </SidebarLink>
@@ -117,7 +96,6 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
                   <SidebarLink
                     href={`/items/${item.id}`}
                     icon={<Star className="size-4 text-muted-foreground" />}
-                    onNavigate={handleNavigate}
                   >
                     {item.title}
                   </SidebarLink>
@@ -135,7 +113,6 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
               <li key={type.id}>
                 <SidebarLink
                   href={`/items/${type.slug}s`}
-                  onNavigate={handleNavigate}
                   icon={
                     Icon ? (
                       <Icon className="size-4" style={{ color: type.color }} />
@@ -177,7 +154,6 @@ export function Sidebar({ onClose, closeOnNavigate = false }: SidebarProps) {
                           style={folderColor ? { color: folderColor } : undefined}
                         />
                       }
-                      onNavigate={handleNavigate}
                     >
                       {collection.name}
                     </SidebarLink>
@@ -232,14 +208,12 @@ interface SidebarLinkProps {
   icon?: React.ReactNode;
   trailing?: React.ReactNode;
   children: React.ReactNode;
-  onNavigate?: () => void;
 }
 
-function SidebarLink({ href, icon, trailing, children, onNavigate }: SidebarLinkProps) {
+function SidebarLink({ href, icon, trailing, children }: SidebarLinkProps) {
   return (
     <Link
       href={href}
-      onClick={onNavigate}
       className={cn(
         "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-foreground transition-colors",
         "hover:bg-surface"

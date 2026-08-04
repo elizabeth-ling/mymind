@@ -1,14 +1,35 @@
-import { Plus, Search } from "lucide-react";
+"use client";
+
+import { PanelLeft, Plus, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { SidebarToggles } from "./sidebar-toggles";
+import { useSidebarControls } from "../layout/dashboard-layout";
 
 export function TopBar() {
+  const { toggleMobile, toggleDesktop } = useSidebarControls();
+
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-3 md:px-4">
-      <SidebarToggles />
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Open sidebar"
+        className="md:hidden"
+        onClick={toggleMobile}
+      >
+        <PanelLeft />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Toggle sidebar"
+        className="hidden md:inline-flex"
+        onClick={toggleDesktop}
+      >
+        <PanelLeft />
+      </Button>
 
       <div className="relative max-w-2xl flex-1">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

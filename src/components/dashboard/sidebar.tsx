@@ -1,14 +1,26 @@
-import Link from "next/link";
-import { Clock, Folder, Lock, Settings, Star, LayoutDashboardIcon } from "lucide-react";
+"use client";
 
+import Link from "next/link";
+import {
+  Clock,
+  Folder,
+  PanelLeftClose,
+  Settings,
+  Star,
+  LayoutDashboardIcon,
+} from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { collections, currentUser, items, itemTypes } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 import { iconMap } from "./icon-map";
-import { SidebarCloseButton } from "./sidebar-close-button";
+import { useSidebarControls } from "../layout/dashboard-layout";
 
 export function Sidebar() {
+  const { closeMobile } = useSidebarControls();
+
   const recentCollections = collections.filter((c) => !c.isFavorite).slice(0, 4);
   const starredItems = items.filter((i) => i.isFavorite).slice(0, 6);
 
@@ -55,7 +67,15 @@ export function Sidebar() {
         >
           mymind
         </Link>
-        <SidebarCloseButton />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Close sidebar"
+          className="-mb-1 size-8 md:hidden"
+          onClick={closeMobile}
+        >
+          <PanelLeftClose />
+        </Button>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 pb-2">
@@ -120,7 +140,12 @@ export function Sidebar() {
                   }
                   trailing={
                     type.isProOnly ? (
-                      <Lock className="size-3 text-muted-foreground" />
+                      <Badge
+                        variant="secondary"
+                        className="px-1.5 py-0 text-[10px] font-semibold tracking-wide"
+                      >
+                        PRO
+                      </Badge>
                     ) : (
                       <span className="text-xs tabular-nums text-muted-foreground">
                         {itemCountByType.get(type.id) ?? 0}
